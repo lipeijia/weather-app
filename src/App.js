@@ -1,10 +1,10 @@
-import React, { useMemo, useEffect, useCallback } from 'react';
+import React, { useMemo, useEffect, useCallback, memo } from 'react';
 import axios from 'axios';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
-import { throttle } from 'lodash';
+import { throttle, debounce } from 'lodash';
 import Forecast from './components/Forecast';
 
 function App() {
@@ -33,10 +33,14 @@ function App() {
     []
   );
 
-  const fetchWeather = useCallback(async (id, callback) => {
-    const res = await axios.get(`${BASE_URL}/location/${id}`);
-    return callback(res.data);
-  }, []);
+  const fetchWeather = useMemo(
+    () =>
+      debounce(async (id, callback) => {
+        const res = await axios.get(`${BASE_URL}/location/${id}`);
+        return callback(res.data);
+      }, 0),
+    []
+  );
 
   useEffect(() => {
     let active = true;
@@ -57,6 +61,7 @@ function App() {
           newOptions = [...results];
         }
         setOptions(newOptions);
+        console.log(newOptions);
       }
     });
     return () => {
@@ -68,9 +73,12 @@ function App() {
     let active = true;
 
     if (!value) return;
-    fetchWeather(value.woeid, (data) => {
-      setWeather(data);
-    });
+    if (active) {
+      fetchWeather(value.woeid, (data) => {
+        setWeather(data);
+        console.log(data);
+      });
+    }
 
     return () => {
       active = false;
