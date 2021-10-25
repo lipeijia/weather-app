@@ -1,16 +1,18 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import { throttle } from 'lodash';
+import Forecast from './components/Forecast';
 
 function App() {
   const BASE_URL = 'https://www.metaweather.com/api';
   const [value, setValue] = React.useState(null);
   const [inputValue, setInputValue] = React.useState('');
   const [options, setOptions] = React.useState([]);
+  const [weather, setWeather] = React.useState([]);
 
   const fetchLocation = useMemo(
     () =>
@@ -19,29 +21,29 @@ function App() {
           const res = await axios.get(
             `${BASE_URL}/location/search/?query=${query}`
           );
-          console.log(res.data);
-          return callback(res.data);
+          if (res.data.length !== 0) {
+            return callback(res.data);
+          } else {
+            return [];
+          }
         } else {
           return [];
         }
-      }, 1000),
+      }, 500),
     []
   );
 
-  // const debouncedFetchData = throttle((query, callback) => {
-  //   fetchLocation(query, callback);
-  // }, 1000);
-
-  // useEffect(() => {
-  //   debouncedFetchData(inputValue);
-  // }, [inputValue, debouncedFetchData]);
+  const fetchWeather = useCallback(async (id, callback) => {
+    const res = await axios.get(`${BASE_URL}/location/${id}`);
+    return callback(res.data);
+  }, []);
 
   useEffect(() => {
     let active = true;
 
     if (inputValue === '') {
       setOptions(value ? [value] : []);
-      return undefined;
+      return;
     }
 
     fetchLocation(inputValue, (results) => {
@@ -51,19 +53,29 @@ function App() {
         if (value) {
           newOptions = [value];
         }
-
         if (results) {
-          newOptions = [...newOptions, ...results];
+          newOptions = [...results];
         }
-
         setOptions(newOptions);
       }
+    });
+    return () => {
+      active = false;
+    };
+  }, [value, inputValue, fetchLocation]);
+
+  useEffect(() => {
+    let active = true;
+
+    if (!value) return;
+    fetchWeather(value.woeid, (data) => {
+      setWeather(data);
     });
 
     return () => {
       active = false;
     };
-  }, [value, inputValue, fetchLocation]);
+  }, [value, fetchWeather]);
 
   return (
     <Container maxWidth='sm'>
@@ -89,8 +101,7 @@ function App() {
         )}
       />
       <p>inputValue: {inputValue}</p>
-      <p>value: {value}</p>
-      {/* <p>options: {options}</p> */}
+      <Forecast temp={weather.consolidated_weather} />
     </Container>
   );
 }
