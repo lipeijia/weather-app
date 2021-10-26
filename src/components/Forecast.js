@@ -1,17 +1,19 @@
-import React, { useEffect, useCallback, useMemo } from 'react';
+import BarChart from './BarChart';
+import PieChart from './PieChart';
+import { arrangeData, applicableDate } from '../utils/helper';
 
-export default function Forecast({ temp = [] }) {
-  const arrangeData = useMemo(
-    () => (keyItem) =>
-      temp.reduce((acc, cur) => [...acc, +cur[keyItem].toFixed(1)], []),
-    [temp]
+export default function Forecast({ data = [] }) {
+  let dates = applicableDate(data, 'applicable_date');
+  let max_temp = arrangeData(data, 'max_temp');
+  let min_temp = arrangeData(data, 'min_temp');
+  let humidity = arrangeData(data, 'humidity');
+
+  return (
+    <>
+      <PieChart />
+      <p>Max Temperature</p>
+      <BarChart data={max_temp || []} dates={dates || []} />
+      <BarChart data={min_temp || []} dates={dates || []} />
+    </>
   );
-  useEffect(() => {
-    const max_temp = arrangeData('max_temp');
-    const min_temp = arrangeData('min_temp');
-    const humidity = arrangeData('humidity');
-    console.log(max_temp, min_temp, humidity);
-  }, [temp, arrangeData]);
-
-  return <div></div>;
 }

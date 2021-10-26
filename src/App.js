@@ -109,7 +109,7 @@ function App() {
         )}
       />
       <p>inputValue: {inputValue}</p>
-      <Forecast temp={weather.consolidated_weather} />
+      <Forecast data={weather.consolidated_weather} />
     </Container>
   );
 }
