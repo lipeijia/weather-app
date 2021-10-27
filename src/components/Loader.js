@@ -3,7 +3,7 @@ import './svg.css';
 
 export default function Loader() {
   return (
-    <div class='loader' title='7'>
+    <div className='loader' title='7'>
       <svg
         version='1.1'
         xmlns='http://www.w3.org/2000/svg'
