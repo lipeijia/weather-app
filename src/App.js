@@ -1,18 +1,20 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import axios from 'axios';
-import TextField from '@mui/material/TextField';
+import { throttle, debounce } from 'lodash';
 import Autocomplete from '@mui/material/Autocomplete';
 import Container from '@mui/material/Container';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { throttle, debounce } from 'lodash';
 import Forecast from './components/Forecast';
+import Loader from './components/Loader';
 
 function App() {
   const BASE_URL = 'https://www.metaweather.com/api';
-  const [value, setValue] = React.useState(null);
-  const [inputValue, setInputValue] = React.useState('');
-  const [options, setOptions] = React.useState([]);
-  const [weather, setWeather] = React.useState([]);
+  const [value, setValue] = useState(null);
+  const [inputValue, setInputValue] = useState('');
+  const [options, setOptions] = useState([]);
+  const [weather, setWeather] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchLocation = useMemo(
     () =>
@@ -42,6 +44,7 @@ function App() {
     []
   );
 
+  // Show city options when user input some text.
   useEffect(() => {
     let active = true;
 
@@ -69,25 +72,36 @@ function App() {
     };
   }, [value, inputValue, fetchLocation]);
 
+  // When user selected a city, then fetch weather of the city
   useEffect(() => {
     let active = true;
 
     if (!value) return;
     if (active) {
+      setLoading(true);
       fetchWeather(value.woeid, (data) => {
         setWeather(data);
-        console.log(data);
+        setLoading(false);
       });
     }
-
     return () => {
       active = false;
     };
   }, [value, fetchWeather]);
 
+  useEffect(() => {
+    if (inputValue === '') setWeather([]);
+  }, [inputValue]);
+
   return (
-    <Container maxWidth='sm'>
-      <Typography variant='h3'>Weather App</Typography>
+    <Container maxWidth='sm' sx={{ marginBottom: '5rem' }}>
+      <Typography
+        variant='h3'
+        align='center'
+        sx={{ marginTop: '5rem', marginBottom: '1rem' }}
+      >
+        Weather Forecast
+      </Typography>
       <Autocomplete
         freeSolo
         disableClearable
@@ -105,11 +119,27 @@ function App() {
           setInputValue(newInputValue);
         }}
         renderInput={(params) => (
-          <TextField {...params} label='Search input' fullWidth />
+          <TextField {...params} label='Search A City' fullWidth />
         )}
       />
-      <p>inputValue: {inputValue}</p>
-      <Forecast data={weather.consolidated_weather} />
+      {loading ? (
+        <Loader />
+      ) : weather.length === 0 ? (
+        ''
+      ) : (
+        <>
+          <br />
+          <Typography
+            variant='h4'
+            component='h4'
+            align='center'
+            sx={{ marginTop: '2rem', background: '#fff' }}
+          >
+            {value.title}
+          </Typography>
+          <Forecast data={weather.consolidated_weather} />
+        </>
+      )}
     </Container>
   );
 }

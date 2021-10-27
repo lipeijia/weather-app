@@ -1,4 +1,15 @@
 .forecast {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  padding: 2rem;
+  border-bottom: solid 2px bisque;
+}
+
+.forecast_header {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 1rem;
+  border-top: solid 2px bisque;
+  border-bottom: solid 2px bisque;
 }

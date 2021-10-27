@@ -1,4 +1,17 @@
 svg#pie {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
+}
+
+.loader {
+  height: 30vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loader svg path,
+.loader svg rect {
+  fill: dimgray;
 }

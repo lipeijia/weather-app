@@ -9,7 +9,7 @@ export default function PieChart({ humidity }) {
         cy='10'
         fill='white'
         stroke='#00697D'
-        strokeWidth='0.4'
+        strokeWidth='0.1'
       />
       <circle
         r='5'
