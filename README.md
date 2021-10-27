@@ -1,9 +1,11 @@
-![](./assets/suggestion.png)
+![](./assets/autocomplete.png)
 ![](./assets/results.png)
 
 ## Available Scripts
 
 In the project directory, first run `yarn install` to install the node_modules,then you can run:
+
+note: Browser extensions to skip CORS problem during developing (ex: Moesif Orign & CORS Changer).
 
 ### `yarn start`
 
