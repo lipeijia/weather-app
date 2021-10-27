@@ -1,19 +1,36 @@
 import BarChart from './BarChart';
 import PieChart from './PieChart';
-import { arrangeData, applicableDate } from '../utils/helper';
+import './forecast.css';
+import { applicableDate } from '../utils/helper';
 
 export default function Forecast({ data = [] }) {
-  let dates = applicableDate(data, 'applicable_date');
-  let max_temp = arrangeData(data, 'max_temp');
-  let min_temp = arrangeData(data, 'min_temp');
-  let humidity = arrangeData(data, 'humidity');
+  const BASE_URL = 'https://www.metaweather.com';
 
+  if (data.length === 0) {
+    return <p>Please Type A City Name</p>;
+  }
   return (
     <>
-      <PieChart />
-      <p>Max Temperature</p>
-      <BarChart data={max_temp || []} dates={dates || []} />
-      <BarChart data={min_temp || []} dates={dates || []} />
+      {data.map((item) => (
+        <div key={item.id} className='forecast'>
+          <p>{applicableDate(item.applicable_date)}</p>
+          <div>
+            <img
+              width={60}
+              height={60}
+              src={`${BASE_URL}/static/img/weather/${item.weather_state_abbr}.svg`}
+              alt=''
+            />
+            <p>{item.weather_state_name}</p>
+          </div>
+
+          <BarChart max_temp={item.max_temp} min_temp={item.min_temp} />
+          <div>
+            <PieChart humidity={item.humidity} />
+            <p>Humidity: {item.humidity}%</p>
+          </div>
+        </div>
+      ))}
     </>
   );
 }

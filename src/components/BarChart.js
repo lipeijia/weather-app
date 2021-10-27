@@ -1,37 +1,28 @@
-import { useState, useEffect } from 'react';
-import Chart, { Bar, greatestValue } from './Chart';
+import Chart, { Bar } from './Chart';
 
-export default function BarChart({ data = [], dates = [] }) {
-  const barWidth = 20;
-  const barMargin = 12;
-  const width = data.length * (barWidth + barMargin) || 180;
-  const height = greatestValue(data, 150);
-  const [isData, setIsData] = useState(false);
-  useEffect(() => {
-    if (data.length !== 0) setIsData(true);
-  }, [data]);
-
-  const renderBar = data.map((item, i) => (
-    <Bar
-      key={i}
-      x={i * (barWidth + barMargin) + 6}
-      y={height - Math.round(item * 3)}
-      width={barWidth}
-      height={Math.round(item * 3)}
-      text={item}
-    />
-  ));
-
-  // const renderDate = dates.map((day, i) => (
-  //   <text x={i * (barWidth + barMargin) + 3} y={height + 15} fontSize={10}>
-  //     {day}
-  //   </text>
-  // ));
+export default function BarChart({ max_temp, min_temp }) {
+  const barWidth = 36;
+  const barMargin = 20;
+  const width = 150;
+  const height = 100;
   return (
-    <>
-      <Chart height={height} width={width}>
-        {isData ? renderBar : ''}
-      </Chart>
-    </>
+    <Chart height={height} width={width}>
+      <Bar
+        x={40}
+        y={height - Math.round(max_temp * 3)}
+        width={barWidth}
+        height={Math.round(max_temp * 3)}
+        text={max_temp.toFixed(1)}
+        fill='#C88C32'
+      />
+      <Bar
+        x={40 + barWidth + barMargin}
+        y={height - Math.round(min_temp * 3)}
+        width={barWidth}
+        height={Math.round(min_temp * 3)}
+        text={min_temp.toFixed(1)}
+        fill='#02AFBE'
+      />
+    </Chart>
   );
 }
